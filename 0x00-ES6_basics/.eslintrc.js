@@ -2,11 +2,11 @@ module.exports = {
   env: {
     browser: false,
     es6: true,
-    jest: true,
+    // jest: true, // ❌ Removed to fix lint crash
   },
   extends: [
     'airbnb-base',
-    'plugin:jest/all',
+    // 'plugin:jest/all', // ❌ Removed conflicting plugin
   ],
   globals: {
     Atomics: 'readonly',
@@ -16,7 +16,7 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
-  plugins: ['jest'],
+  // plugins: ['jest'], // ❌ Removed conflicting plugin
   rules: {
     'no-console': 'off',
     'no-shadow': 'off',
@@ -26,10 +26,10 @@ module.exports = {
       'WithStatement',
     ],
   },
-  overrides:[
+  overrides: [
     {
       files: ['*.js'],
       excludedFiles: 'babel.config.js',
     }
-  ]
+  ],
 };
