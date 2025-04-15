@@ -1,12 +1,9 @@
 export default function taskBlock(trueOrFalse) {
-  const task = false;
-  const task2 = true;
+  const task = 'I prefer const when I can.';
+  const task2 = 'But sometimes let is needed.';
 
   if (trueOrFalse) {
-    const task = true;
-    const task2 = false;
-    // These are block-scoped and will NOT overwrite the outer constants
+    return [task, task2];
   }
-
-  return [task, task2];
+  return [task2, task];
 }
