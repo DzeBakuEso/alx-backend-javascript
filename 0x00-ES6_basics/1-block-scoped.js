@@ -5,7 +5,7 @@ export default function taskBlock(trueOrFalse) {
   if (trueOrFalse) {
     let task = true;
     let task2 = false;
-    // This block-scoped `task` and `task2` only exist here
+    // These are block-scoped and will NOT overwrite the outer constants
   }
 
   return [task, task2];
