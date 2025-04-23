@@ -1,4 +1,4 @@
-// Define the Teacher interface
+// Interface for Teacher
 interface Teacher {
   readonly firstName: string;
   readonly lastName: string;
@@ -8,17 +8,17 @@ interface Teacher {
   [key: string]: any;
 }
 
-// Extend Teacher to define Directors interface
+// Interface for Directors extending Teacher
 interface Directors extends Teacher {
   numberOfReports: number;
 }
 
-// Define the interface for the printTeacher function
+// Interface for printTeacher function
 interface printTeacherFunction {
   (firstName: string, lastName: string): string;
 }
 
-// Implement the function
+// Implementation of printTeacher
 const printTeacher: printTeacherFunction = (firstName, lastName) => {
   return `${firstName.charAt(0)}. ${lastName}`;
 };
@@ -31,6 +31,44 @@ const director1: Directors = {
   fullTimeEmployee: true,
   numberOfReports: 17,
 };
-
 console.log(director1);
 console.log(printTeacher("John", "Doe")); // Output: J. Doe
+
+// =========================
+// Task 4: Writing a class
+// =========================
+
+// Interface for the constructor
+interface StudentConstructor {
+  new(firstName: string, lastName: string): StudentClassInterface;
+}
+
+// Interface for the class
+interface StudentClassInterface {
+  workOnHomework(): string;
+  displayName(): string;
+}
+
+// Class implementation
+class StudentClass implements StudentClassInterface {
+  private firstName: string;
+  private lastName: string;
+
+  constructor(firstName: string, lastName: string) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+
+  workOnHomework(): string {
+    return "Currently working";
+  }
+
+  displayName(): string {
+    return this.firstName;
+  }
+}
+
+// Example usage
+const student = new StudentClass("Dzeble", "Frank");
+console.log(student.displayName());      // Output: Dzeble
+console.log(student.workOnHomework());   // Output: Currently working
