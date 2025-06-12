@@ -1,15 +1,17 @@
 {
   "name": "task_0",
   "version": "1.0.0",
-  "description": "Basic test with Mocha and Node assert",
+  "description": "Basic test with Mocha, Chai, and Sinon",
   "main": "0-calcul.js",
   "scripts": {
     "test": "mocha"
   },
   "author": "Dzeble Frank",
   "license": "ISC",
+  "type": "commonjs",
   "devDependencies": {
-    "mocha": "^10.8.2"
+    "mocha": "^10.8.2",
+    "sinon": "^20.0.0"
   },
   "dependencies": {
     "chai": "^4.3.7"
