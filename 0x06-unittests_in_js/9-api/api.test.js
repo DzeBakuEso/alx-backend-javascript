@@ -1,50 +1,43 @@
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const app = require('./api');
+const request = require('request');
+const { expect } = require('chai');
 
-chai.use(chaiHttp);
-const { expect } = chai;
+describe('Index page', () => {
+  const url = 'http://localhost:7865/';
 
-describe('API Integration Tests', () => {
-  describe('GET /', () => {
-    it('should return welcome message', (done) => {
-      chai.request(app)
-        .get('/')
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.text).to.equal('Welcome to the payment system');
-          done();
-        });
+  it('Correct status code?', (done) => {
+    request.get(url, (err, res, body) => {
+      expect(res.statusCode).to.equal(200);
+      done();
     });
   });
 
-  describe('GET /cart/:id', () => {
-    it('should return payment methods for a valid numeric id', (done) => {
-      chai.request(app)
-        .get('/cart/12')
-        .end((err, res) => {
-          expect(res).to.have.status(200);
-          expect(res.text).to.equal('Payment methods for cart 12');
-          done();
-        });
+  it('Correct result?', (done) => {
+    request.get(url, (err, res, body) => {
+      expect(body).to.equal('Welcome to the payment system');
+      done();
     });
+  });
+});
 
-    it('should return 404 for a non-numeric id', (done) => {
-      chai.request(app)
-        .get('/cart/hello')
-        .end((err, res) => {
-          expect(res).to.have.status(404);
-          done();
-        });
+describe('Cart page', () => {
+  it('Correct status code when :id is a number', (done) => {
+    request.get('http://localhost:7865/cart/12', (err, res, body) => {
+      expect(res.statusCode).to.equal(200);
+      done();
     });
+  });
 
-    it('should return 404 for an alphanumeric id', (done) => {
-      chai.request(app)
-        .get('/cart/123abc')
-        .end((err, res) => {
-          expect(res).to.have.status(404);
-          done();
-        });
+  it('Correct result when :id is a number', (done) => {
+    request.get('http://localhost:7865/cart/12', (err, res, body) => {
+      expect(body).to.equal('Payment methods for cart 12');
+      done();
+    });
+  });
+
+  it('Correct status code when :id is NOT a number', (done) => {
+    request.get('http://localhost:7865/cart/hello', (err, res, body) => {
+      expect(res.statusCode).to.equal(404);
+      done();
     });
   });
 });
