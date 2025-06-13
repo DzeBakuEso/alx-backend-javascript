@@ -1,22 +1,24 @@
+// api.js
 const express = require('express');
-const bodyParser = require('body-parser');
-
 const app = express();
-const port = 7865;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.status(200).send('Welcome to the payment system');
+  res.send('Welcome to the payment system');
 });
 
-app.get('/cart/:id(\\d+)', (req, res) => {
+app.get('/cart/:id', (req, res) => {
   const id = req.params.id;
-  res.status(200).send(`Payment methods for cart ${id}`);
+  if (!Number.isInteger(Number(id))) {
+    res.status(404).send();
+  } else {
+    res.send(`Payment methods for cart ${id}`);
+  }
 });
 
 app.get('/available_payments', (req, res) => {
-  res.status(200).json({
+  res.json({
     payment_methods: {
       credit_cards: true,
       paypal: false
@@ -26,15 +28,18 @@ app.get('/available_payments', (req, res) => {
 
 app.post('/login', (req, res) => {
   const { userName } = req.body;
-  if (userName) {
-    res.status(200).send(`Welcome ${userName}`);
-  } else {
+  if (!userName) {
     res.status(400).send('Missing userName');
+  } else {
+    res.send(`Welcome ${userName}`);
   }
 });
 
-app.listen(port, () => {
-  console.log(`API available on localhost port ${port}`);
-});
+// Only start server if run directly, not when imported for testing
+if (require.main === module) {
+  app.listen(7865, () => {
+    console.log('API available on localhost port 7865');
+  });
+}
 
 module.exports = app;

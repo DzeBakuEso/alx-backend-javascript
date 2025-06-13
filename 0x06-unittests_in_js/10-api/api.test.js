@@ -1,15 +1,44 @@
+// api.test.js
+const chai = require('chai');
+const expect = chai.expect;
 const request = require('supertest');
-const { expect } = require('chai');
 const app = require('./api');
 
-describe('API integration tests', () => {
+describe('API Tests', () => {
+  it('GET / should return welcome message', (done) => {
+    request(app)
+      .get('/')
+      .expect(200)
+      .end((err, res) => {
+        expect(res.text).to.equal('Welcome to the payment system');
+        done();
+      });
+  });
+
+  describe('GET /cart/:id', () => {
+    it('should return correct message when id is a number', (done) => {
+      request(app)
+        .get('/cart/12')
+        .expect(200)
+        .end((err, res) => {
+          expect(res.text).to.equal('Payment methods for cart 12');
+          done();
+        });
+    });
+
+    it('should return 404 when id is not a number', (done) => {
+      request(app)
+        .get('/cart/abc')
+        .expect(404, done);
+    });
+  });
+
   describe('GET /available_payments', () => {
-    it('should return available payment methods as an object', (done) => {
+    it('should return correct payment methods object', (done) => {
       request(app)
         .get('/available_payments')
         .expect(200)
         .end((err, res) => {
-          if (err) return done(err);
           expect(res.body).to.deep.equal({
             payment_methods: {
               credit_cards: true,
@@ -22,15 +51,13 @@ describe('API integration tests', () => {
   });
 
   describe('POST /login', () => {
-    it('should return welcome message with userName', (done) => {
+    it('should return welcome message with username', (done) => {
       request(app)
         .post('/login')
-        .send({ userName: 'Betty' })
-        .set('Content-Type', 'application/json')
+        .send({ userName: 'Frank' })
         .expect(200)
         .end((err, res) => {
-          if (err) return done(err);
-          expect(res.text).to.equal('Welcome Betty');
+          expect(res.text).to.equal('Welcome Frank');
           done();
         });
     });
@@ -39,8 +66,11 @@ describe('API integration tests', () => {
       request(app)
         .post('/login')
         .send({})
-        .set('Content-Type', 'application/json')
-        .expect(400, done);
+        .expect(400)
+        .end((err, res) => {
+          expect(res.text).to.equal('Missing userName');
+          done();
+        });
     });
   });
 });
