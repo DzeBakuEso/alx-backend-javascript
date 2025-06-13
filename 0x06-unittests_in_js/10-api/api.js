@@ -1,6 +1,6 @@
-// api.js
 const express = require('express');
 const app = express();
+const port = 7865;
 
 app.use(express.json());
 
@@ -9,9 +9,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/cart/:id', (req, res) => {
-  const id = req.params.id;
-  if (!Number.isInteger(Number(id))) {
-    res.status(404).send();
+  const id = Number(req.params.id);
+  if (isNaN(id)) {
+    res.status(404).end();
   } else {
     res.send(`Payment methods for cart ${id}`);
   }
@@ -29,17 +29,13 @@ app.get('/available_payments', (req, res) => {
 app.post('/login', (req, res) => {
   const { userName } = req.body;
   if (!userName) {
-    res.status(400).send('Missing userName');
-  } else {
-    res.send(`Welcome ${userName}`);
+    return res.status(400).send('Missing userName');
   }
+  res.send(`Welcome ${userName}`);
 });
 
-// Only start server if run directly, not when imported for testing
-if (require.main === module) {
-  app.listen(7865, () => {
-    console.log('API available on localhost port 7865');
-  });
-}
+app.listen(port, () => {
+  console.log(`API available on localhost port ${port}`);
+});
 
 module.exports = app;
