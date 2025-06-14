@@ -1,29 +1,45 @@
-const express = require('express');
-const countStudents = require('./3-read_file_async');
+// 7-http_express.js
+import express from 'express';
+import { readFile } from 'fs/promises';
 
 const app = express();
-const PORT = 1245;
+const port = 1245;
+
+function countStudents(path) {
+  return readFile(path, 'utf-8')
+    .then((data) => {
+      const lines = data.trim().split('\n').filter((line) => line.trim() !== '');
+      const headers = lines.shift().split(',');
+      const students = {};
+      for (const line of lines) {
+        const values = line.split(',');
+        const field = values[3];
+        if (!students[field]) students[field] = [];
+        students[field].push(values[0]);
+      }
+
+      let output = `Number of students: ${lines.length}`;
+      for (const [field, names] of Object.entries(students)) {
+        output += `\nNumber of students in ${field}: ${names.length}. List: ${names.join(', ')}`;
+      }
+      return output;
+    });
+}
 
 app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/plain');
-  res.status(200).send('Hello ALX!');
+  res.send('Hello ALX!');
 });
 
 app.get('/students', async (req, res) => {
-  const database = process.argv[2];
-  res.setHeader('Content-Type', 'text/plain');
-  let response = 'This is the list of our students';
-
+  const db = process.argv[2];
   try {
-    const result = await countStudents(database);
-    response += `\n${result}`;
-    res.status(200).send(response);
-  } catch (error) {
-    response += `\n${error.message}`;
-    res.status(500).send(response);
+    const report = await countStudents(db);
+    res.send(`This is the list of our students\n${report}`);
+  } catch (err) {
+    res.status(500).send('Cannot load the database');
   }
 });
 
-app.listen(PORT);
+app.listen(port);
 
-module.exports = app;
+export default app;
