@@ -2,46 +2,37 @@ const fs = require('fs');
 
 function countStudents(path) {
   return new Promise((resolve, reject) => {
+    if (!fs.existsSync(path)) {
+      reject(new Error('Cannot load the database'));
+      return;
+    }
+
     fs.readFile(path, 'utf8', (err, data) => {
-      if (err) {
+      if (err || !data) {
         reject(new Error('Cannot load the database'));
         return;
       }
 
-      const lines = data.split('\n').filter((line) => line.trim() !== '');
-      if (lines.length < 2) {
-        resolve();
-        return;
-      }
+      const lines = data.trim().split('\n').filter((line) => line.trim() !== '');
+      const students = lines.slice(1).map((line) => line.split(','));
+      const fields = {};
 
-      const headers = lines[0].split(',');
-      const fieldIndex = headers.indexOf('field');
-      const firstNameIndex = headers.indexOf('firstname');
-      const studentsByField = {};
-
-      for (let i = 1; i < lines.length; i += 1) {
-        const row = lines[i].split(',');
-        const field = row[fieldIndex];
-        const firstName = row[firstNameIndex];
-
-        if (!studentsByField[field]) {
-          studentsByField[field] = [];
+      students.forEach((student) => {
+        const field = student[3];
+        const name = student[0];
+        if (field && name) {
+          if (!fields[field]) fields[field] = [];
+          fields[field].push(name);
         }
-        studentsByField[field].push(firstName);
+      });
+
+      let output = `Number of students: ${students.length}`;
+      for (const field in fields) {
+        const list = fields[field].join(', ');
+        output += `\nNumber of students in ${field}: ${fields[field].length}. List: ${list}`;
       }
 
-      const totalStudents = Object.values(studentsByField)
-        .reduce((acc, val) => acc + val.length, 0);
-
-      console.log(`Number of students: ${totalStudents}`);
-      for (const field in studentsByField) {
-        if (Object.prototype.hasOwnProperty.call(studentsByField, field)) {
-          const list = studentsByField[field].join(', ');
-          console.log(`Number of students in ${field}: ${studentsByField[field].length}. List: ${list}`);
-        }
-      }
-
-      resolve();
+      resolve(output);
     });
   });
 }
