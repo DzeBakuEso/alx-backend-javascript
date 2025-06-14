@@ -3,54 +3,58 @@ const fs = require('fs');
 
 function countStudents(path) {
   return new Promise((resolve, reject) => {
-    fs.readFile(path, { encoding: 'utf-8' }, (err, data) => {
+    fs.readFile(path, 'utf8', (err, data) => {
       if (err) {
         reject(new Error('Cannot load the database'));
         return;
       }
 
-      const lines = data.split('\n').filter((line) => line.trim() !== '');
-      const students = lines.slice(1); // skip header
+      const lines = data.trim().split('\n');
+      const students = lines.slice(1).filter((line) => line.trim() !== '');
+
       const fields = {};
+      students.forEach((line) => {
+        const parts = line.split(',');
+        const field = parts[3];
+        const firstName = parts[0];
 
-      for (const student of students) {
-        const details = student.split(',');
-        const field = details[3];
-        const firstName = details[0];
-        if (field in fields) {
-          fields[field].push(firstName);
-        } else {
-          fields[field] = [firstName];
-        }
-      }
+        if (!fields[field]) fields[field] = [];
+        fields[field].push(firstName);
+      });
 
-      let output = `Number of students: ${students.length}`;
+      const total = students.length;
+      let report = `Number of students: ${total}`;
       for (const [field, names] of Object.entries(fields)) {
-        output += `\nNumber of students in ${field}: ${names.length}. List: ${names.join(', ')}`;
+        report += `\nNumber of students in ${field}: ${names.length}. List: ${names.join(', ')}`;
       }
 
-      resolve(output);
+      resolve(report);
     });
   });
 }
 
 const app = http.createServer((req, res) => {
-  const databasePath = process.argv[2];
+  const { url } = req;
+
   res.setHeader('Content-Type', 'text/plain');
 
-  if (req.url === '/') {
+  if (url === '/') {
+    res.statusCode = 200;
     res.end('Hello ALX!');
-  } else if (req.url === '/students') {
-    countStudents(databasePath)
-      .then((output) => {
-        res.end(`This is the list of our students\n${output}`);
+  } else if (url === '/students') {
+    const path = process.argv[2];
+    countStudents(path)
+      .then((report) => {
+        res.statusCode = 200;
+        res.end(`This is the list of our students\n${report}`);
       })
       .catch((err) => {
-        res.end('This is the list of our students\n' + err.message);
+        res.statusCode = 500;
+        res.end(`This is the list of our students\n${err.message}`);
       });
   } else {
     res.statusCode = 404;
-    res.end('Not Found');
+    res.end('Not found');
   }
 });
 
